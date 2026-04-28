@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { roleConfig } from "../data/mockData";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "shipper" });
@@ -12,11 +11,15 @@ export default function Signup() {
     if (user?.role) navigate(`/${user.role}/dashboard`, { replace: true });
   }, [user, navigate]);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.password) return;
-    signup({ ...form, name: form.name || roleConfig[form.role].demoUser.name });
-    navigate(`/${form.role}/dashboard`);
+    try {
+      const userData = await signup({ ...form });
+      navigate(`/${userData.role}/dashboard`);
+    } catch (err) {
+      alert(err.response?.data?.message || "Signup failed");
+    }
   };
   return (
     <div className="auth-screen active">

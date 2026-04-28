@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DashboardCards from "../../components/DashboardCards";
 import DataTable from "../../components/DataTable";
 import Modal from "../../components/Modal";
-import { dashboardData, tableData } from "../../data/mockData";
+import { tableData } from "../../data/mockData";
 import { usePlatform } from "../../context/PlatformContext";
 
 export default function ClientDashboard() {
@@ -10,11 +10,12 @@ export default function ClientDashboard() {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [rating, setRating] = useState(5);
   const { orders, rateOrder } = usePlatform();
+
   const rows = orders.map((o) => [
-    o.id,
-    o.shipmentId,
-    "Electrique",
-    o.eta,
+    o.reference,
+    `${o.origin} -> ${o.destination}`,
+    o.vehicle_type || "-",
+    o.deadline ? new Date(o.deadline).toLocaleDateString() : "-",
     <button
       key={o.id}
       className="btn btn-ghost btn-sm"
@@ -26,11 +27,20 @@ export default function ClientDashboard() {
       Noter
     </button>,
   ]);
+
+  const cards = useMemo(() => {
+    const active = orders.filter(o => o.status !== 'DELIVERED').length;
+    const delivered = orders.filter(o => o.status === 'DELIVERED').length;
+    return [
+      { icon: "📦", value: active.toString(), label: "Commandes en cours", trend: "Total", tone: "sc-green" },
+      { icon: "🌿", value: "100%", label: "Expedies sans CO2", trend: "Green certifie", tone: "sc-navy" },
+      { icon: "🚚", value: delivered.toString(), label: "Colis arrives", trend: "Termines", tone: "sc-green" },
+    ];
+  }, [orders]);
+
   return (
     <>
-      <DashboardCards
-        cards={dashboardData.client.cards}
-      />
+      <DashboardCards cards={cards} />
       <DataTable
         title={tableData.orders.title}
         columns={[...tableData.orders.columns, "Action"]}

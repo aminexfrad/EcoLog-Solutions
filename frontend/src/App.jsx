@@ -50,6 +50,7 @@ export default function App() {
         <Route path="/client" element={<AppLayout role="client" />}>
           <Route path="dashboard" element={<ClientDashboard />} />
           <Route path="orders" element={<RoleTablePage role="client" pageKey="orders" />} />
+          <Route path="tracking" element={<RoleTablePage role="client" pageKey="tracking" />} />
           <Route path="impact" element={<RoleReportPage role="client" pageKey="impact" />} />
           <Route path="documents" element={<RoleTablePage role="client" pageKey="documents" />} />
           <Route path="notifications" element={<RoleTablePage role="client" pageKey="notifications" />} />

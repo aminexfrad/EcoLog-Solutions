@@ -22,11 +22,15 @@ export default function Login() {
     if (user?.role) navigate(`/${user.role}/dashboard`, { replace: true });
   }, [user, navigate]);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     if (!email || !password) return;
-    login({ email, role, name: roleConfig[role].demoUser.name });
-    navigate(`/${role}/dashboard`);
+    try {
+      const userData = await login({ email, password });
+      navigate(`/${userData.role}/dashboard`);
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (

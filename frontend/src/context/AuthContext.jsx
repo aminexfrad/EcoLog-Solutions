@@ -1,4 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
+import api from "../services/api";
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = "ecolog_user";
@@ -14,13 +15,30 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const login = (payload) => {
-    setUser(payload);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  const login = async (payload) => {
+    try {
+      const response = await api.post('/auth/login', payload);
+      const userData = { ...response.data.user, token: response.data.token };
+      setUser(userData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+      return userData;
+    } catch (error) {
+      console.error("Login failed:", error.response?.data?.message || error.message);
+      throw error;
+    }
   };
 
-  const signup = (payload) => {
-    login(payload);
+  const signup = async (payload) => {
+    try {
+      const response = await api.post('/auth/register', payload);
+      const userData = { ...response.data.user, token: response.data.token };
+      setUser(userData);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
+      return userData;
+    } catch (error) {
+      console.error("Signup failed:", error.response?.data?.message || error.message);
+      throw error;
+    }
   };
 
   const logout = () => {

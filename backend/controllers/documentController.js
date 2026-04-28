@@ -1,0 +1,46 @@
+const db = require('../config/db');
+
+// GET /api/documents/:shipmentId
+exports.getByShipment = async (req, res, next) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT d.*, u.name as uploaded_by_name
+       FROM documents d
+       JOIN users u ON u.id = d.uploaded_by
+       WHERE d.shipment_id = ? ORDER BY d.created_at DESC`,
+      [req.params.shipmentId]
+    );
+    res.json(rows);
+  } catch (err) { next(err); }
+};
+
+// GET /api/documents
+exports.getAll = async (req, res, next) => {
+  try {
+    let query = `
+      SELECT d.*, u.name as uploaded_by_name, s.reference
+      FROM documents d
+      JOIN shipments s ON s.id = d.shipment_id
+      JOIN users u ON u.id = d.uploaded_by`;
+    const params = [];
+    if (req.user.role === 'shipper') { query += ' WHERE s.shipper_id = ?'; params.push(req.user.id); }
+    else if (req.user.role === 'carrier') { query += ' WHERE s.carrier_id = ?'; params.push(req.user.id); }
+    query += ' ORDER BY d.created_at DESC';
+    const [rows] = await db.execute(query, params);
+    res.json(rows);
+  } catch (err) { next(err); }
+};
+
+// POST /api/documents
+exports.create = async (req, res, next) => {
+  try {
+    const { shipment_id, type } = req.body;
+    const file_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const [result] = await db.execute(
+      'INSERT INTO documents (shipment_id, type, file_url, uploaded_by) VALUES (?, ?, ?, ?)',
+      [shipment_id, type, file_url, req.user.id]
+    );
+    const [rows] = await db.execute('SELECT * FROM documents WHERE id = ?', [result.insertId]);
+    res.status(201).json(rows[0]);
+  } catch (err) { next(err); }
+};
