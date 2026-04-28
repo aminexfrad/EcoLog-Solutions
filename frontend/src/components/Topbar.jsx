@@ -16,9 +16,6 @@ export default function Topbar({ title, onPrimaryClick, primaryLabel, score, onL
             {primaryLabel}
           </button>
         )}
-        <button className="btn btn-ghost btn-sm" onClick={onLogout}>
-          ⇥ Deconnexion
-        </button>
       </div>
     </div>
   );
