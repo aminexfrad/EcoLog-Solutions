@@ -79,7 +79,7 @@ export function RoleTablePage({ role, pageKey }) {
       <div className="card">
         <div className="card-b">
           <div className="pg-title">{roleTitle}</div>
-          <div className="pg-sub">Donnees connectees a l'API Backend.</div>
+          <div className="pg-sub">Suivi et gestion de votre activité logistique en temps réel.</div>
 
           {pageKey === "shipments" && (
             <div className="form-grid" style={{ marginTop: 12 }}>
@@ -186,7 +186,7 @@ export function RoleReportPage({ role, pageKey }) {
       </div>
       <div className="card-b">
         <div className="pg-sub" style={{ marginBottom: 10 }}>
-          {roleTitle} - Connecte a l'API
+          Rapport généré automatiquement à partir de vos données d'activité.
         </div>
         {data.highlights.map((item) => (
           <div key={item} style={{ marginBottom: 8 }}>
@@ -223,7 +223,7 @@ export function RoleProfilePage({ role }) {
         <div style={{ marginBottom: 8 }}>
           <strong>Role:</strong> {roleMeta?.subtitle}
         </div>
-        <div className="pg-sub">Identifiants backend charges.</div>
+        <div className="pg-sub">Gérez vos informations personnelles et préférences de sécurité.</div>
       </div>
     </div>
   );
