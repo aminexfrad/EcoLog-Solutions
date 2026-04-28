@@ -665,12 +665,106 @@ tbody tr:hover {
   resize: vertical;
 }
 
+/* RESPONSIVENESS */
 @media (max-width: 1024px) {
   .auth-left { display: none; }
+  
   .sidebar { width: 80px; }
-  .sb-brand-text, .sb-brand-sub, .nav-item span:not(.nav-ic), .user-sb-name, .user-sb-role { display: none; }
-  .nav-item { justify-content: center; }
+  .sb-brand-text, .sb-brand-sub, .user-sb-name, .user-sb-role { display: none; }
+  .nav-item span:not(.nav-ic) { display: none; }
+  .nav-item { justify-content: center; padding: 12px; }
   .sidebar-brand { padding: 24px 16px; justify-content: center; }
   .user-card-sb { flex-direction: column; }
   .logout-btn { margin-left: 0; }
+  
+  .content { padding: 24px; }
+}
+
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-brand {
+    padding: 12px 0;
+    border-bottom: none;
+  }
+  
+  .sb-brand-text {
+    display: block;
+    font-size: 16px;
+  }
+
+  .nav {
+    flex-direction: row;
+    padding: 0;
+    gap: 16px;
+    overflow-x: auto;
+  }
+
+  .sidebar-footer {
+    padding: 12px 0;
+    border-top: none;
+  }
+
+  .user-card-sb {
+    flex-direction: row;
+  }
+
+  .topbar {
+    padding: 16px;
+    height: auto;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .topbar-search, .topbar-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-right {
+    padding: 20px;
+  }
+
+  .auth-hero h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-h {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .topbar-actions {
+    flex-wrap: wrap;
+  }
+  
+  th, td {
+    padding: 12px 16px;
+  }
 }
