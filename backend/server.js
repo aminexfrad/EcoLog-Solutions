@@ -32,6 +32,7 @@ app.use('/api/documents',     require('./routes/documents'));
 app.use('/api/reports',       require('./routes/reports'));
 app.use('/api/audit',         require('./routes/audit'));
 app.use('/api/vehicles',      require('./routes/vehicles'));
+app.use('/api/ai',            require('./routes/ai'));
 
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date() }));

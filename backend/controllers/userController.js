@@ -15,9 +15,13 @@ exports.getAll = async (req, res, next) => {
 // GET /api/users/:id
 exports.getById = async (req, res, next) => {
   try {
+    const targetId = parseInt(req.params.id, 10);
+    if (req.user.role !== 'admin' && req.user.id !== targetId) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
     const [rows] = await db.execute(
       'SELECT id, name, email, role, company, phone, is_active, green_score, created_at FROM users WHERE id = ?',
-      [req.params.id]
+      [targetId]
     );
     if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable.' });
     res.json(rows[0]);

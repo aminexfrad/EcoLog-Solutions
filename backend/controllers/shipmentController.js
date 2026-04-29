@@ -96,7 +96,8 @@ exports.getAll = async (req, res, next) => {
       query += ' WHERE s.carrier_id = ?';
       params.push(req.user.id);
     } else if (req.user.role === 'client') {
-      // Clients see all shipments (their orders)
+      query += ' WHERE s.shipper_id = ?';
+      params.push(req.user.id);
     }
     query += ' ORDER BY s.created_at DESC';
 
@@ -123,9 +124,17 @@ exports.getById = async (req, res, next) => {
       [req.params.id]
     );
     if (rows.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
+    const shipment = rows[0];
+    const canAccess =
+      req.user.role === 'admin' ||
+      shipment.shipper_id === req.user.id ||
+      shipment.carrier_id === req.user.id;
+    if (!canAccess) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
 
     // Options de comparaison CO2
-    const cf = rows[0];
+    const cf = shipment;
     const options = cf.distance_km ? compareOptions(cf.distance_km, cf.weight_kg) : [];
     res.json({ ...rows[0], co2_options: options });
   } catch (err) { next(err); }

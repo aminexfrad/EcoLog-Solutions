@@ -79,7 +79,6 @@ export default function Signup() {
               <option value="shipper">Expéditeur</option>
               <option value="carrier">Transporteur</option>
               <option value="client">Client final</option>
-              <option value="admin">Administrateur</option>
             </select>
           </div>
           

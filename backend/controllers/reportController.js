@@ -42,14 +42,22 @@ exports.carbon = async (req, res, next) => {
 // GET /api/reports/esg  (ESG report)
 exports.esg = async (req, res, next) => {
   try {
-    const [[shipments]] = await db.execute('SELECT COUNT(*) as cnt FROM shipments WHERE shipper_id = ?', [req.user.id]);
-    const [[co2]]       = await db.execute(
-      'SELECT SUM(cf.co2_kg) as total FROM carbon_footprints cf JOIN shipments s ON s.id = cf.shipment_id WHERE s.shipper_id = ?',
-      [req.user.id]
+    const isAdmin = req.user.role === 'admin';
+    const shipParams = isAdmin ? [] : [req.user.id];
+    const shipWhere = isAdmin ? '' : 'WHERE shipper_id = ?';
+    const co2Params = isAdmin ? [] : [req.user.id];
+    const co2Where = isAdmin ? '' : 'WHERE s.shipper_id = ?';
+    const compParams = isAdmin ? [] : [req.user.id];
+    const compWhere = isAdmin ? '' : 'WHERE user_id = ?';
+
+    const [[shipments]] = await db.execute(`SELECT COUNT(*) as cnt FROM shipments ${shipWhere}`, shipParams);
+    const [[co2]] = await db.execute(
+      `SELECT SUM(cf.co2_kg) as total FROM carbon_footprints cf JOIN shipments s ON s.id = cf.shipment_id ${co2Where}`,
+      co2Params
     );
     const [[comp]] = await db.execute(
-      'SELECT SUM(tons_compensated) as tons, SUM(price_eur) as eur FROM compensations WHERE user_id = ?',
-      [req.user.id]
+      `SELECT SUM(tons_compensated) as tons, SUM(price_eur) as eur FROM compensations ${compWhere}`,
+      compParams
     );
     const total_co2   = parseFloat((co2.total || 0).toFixed(4));
     const compensated = parseFloat((comp.tons || 0).toFixed(4));

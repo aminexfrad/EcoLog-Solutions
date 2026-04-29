@@ -2,6 +2,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/Sidebar";
 import Topbar from "../components/Topbar";
+import ChatbotWidget from "../components/ChatbotWidget";
 import { roleConfig } from "../data/mockData";
 
 const titleBySlug = {
@@ -64,6 +65,7 @@ export default function AppLayout({ role, onPrimaryClick }) {
           <Outlet />
         </div>
       </main>
+      <ChatbotWidget role={role} />
     </div>
   );
 }

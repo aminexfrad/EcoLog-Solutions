@@ -50,15 +50,6 @@ export function PlatformProvider({ children }) {
       if (user.role === 'client') {
         const shipRes = await api.get('/shipments');
         setOrders(shipRes.data);
-      }
-
-      const [notifRes, docRes] = await Promise.all([api.get('/notifications'), api.get('/documents')]);
-      setNotifications(notifRes.data.notifications || []);
-      setDocuments(docRes.data || []);
-
-      // If user has shipments, maybe fetch tracking for the latest active shipment?
-      if (user.role === 'client') {
-        const shipRes = await api.get('/shipments');
         if (shipRes.data.length > 0) {
            const active = shipRes.data.find(s => s.status !== 'DELIVERED');
            if (active) {
@@ -67,6 +58,10 @@ export function PlatformProvider({ children }) {
            }
         }
       }
+
+      const [notifRes, docRes] = await Promise.all([api.get('/notifications'), api.get('/documents')]);
+      setNotifications(notifRes.data.notifications || []);
+      setDocuments(docRes.data || []);
       
     } catch (e) {
       console.error('Failed to fetch platform data', e);
@@ -132,7 +127,8 @@ export function PlatformProvider({ children }) {
     await fetchDashboardData();
   };
 
-  const updateTracking = async (shipmentId, progress, location) => {
+  const updateTracking = async (shipmentId) => {
+    if (user?.role !== "carrier" && user?.role !== "admin") return;
     await api.post(`/tracking/${shipmentId}/simulate`);
     await fetchDashboardData();
   };

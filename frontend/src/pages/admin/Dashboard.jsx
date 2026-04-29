@@ -30,17 +30,17 @@ export default function AdminDashboard() {
         <div className="card-h">
           <span className="card-title">Administration rapide</span>
         </div>
-        <div className="card-b">
-          <div style={{ marginBottom: 12 }}>
+        <div className="card-b actions-grid">
+          <div className="actions-toolbar">
             {users.map((u) => (
-              <button key={u.id} className="btn btn-ghost btn-sm" style={{ marginRight: 8, marginTop: 8 }} onClick={() => toggleUser(u.id)}>
+              <button key={u.id} className="btn btn-ghost btn-sm" onClick={() => toggleUser(u.id)}>
                 {u.is_active ? "Desactiver" : "Activer"} {u.name}
               </button>
             ))}
           </div>
-          <div>
+          <div className="actions-toolbar">
             {carrierRequests.map((c) => (
-              <button key={c.id} className="btn btn-primary btn-sm" style={{ marginRight: 8, marginTop: 8 }} onClick={() => reviewCarrierRequest(c.id, "Valide")}>
+              <button key={c.id} className="btn btn-primary btn-sm" onClick={() => reviewCarrierRequest(c.id, "Valide")}>
                 Valider {c.name}
               </button>
             ))}

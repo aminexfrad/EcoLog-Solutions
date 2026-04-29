@@ -17,6 +17,11 @@ exports.register = async (req, res, next) => {
     if (!name || !email || !password)
       return res.status(400).json({ message: 'Nom, email et mot de passe sont requis.' });
 
+    const allowedRoles = ['shipper', 'carrier', 'client'];
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({ message: 'Rôle invalide pour inscription publique.' });
+    }
+
     const [existing] = await db.execute('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0)
       return res.status(409).json({ message: 'Email déjà utilisé.' });

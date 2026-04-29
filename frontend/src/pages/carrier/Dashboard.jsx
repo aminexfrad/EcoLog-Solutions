@@ -5,7 +5,7 @@ import { tableData } from "../../data/mockData";
 import { usePlatform } from "../../context/PlatformContext";
 
 export default function CarrierDashboard() {
-  const { missions, setMissionStatus } = usePlatform();
+  const { missions, setMissionStatus, acceptMission } = usePlatform();
   const rows = missions.map((m) => [m.reference, `${m.origin} -> ${m.destination}`, m.vehicle_type, m.status]);
 
   const cards = useMemo(() => {
@@ -29,22 +29,25 @@ export default function CarrierDashboard() {
         <div className="card-h">
           <span className="card-title">Actions mission</span>
         </div>
-        <div className="card-b">
+        <div className="card-b actions-grid">
           {missions.map((m) => (
-            <div key={m.id} style={{ marginBottom: 8 }}>
-              <span style={{ marginRight: 8 }}>{m.reference} ({m.status})</span>
-              {m.status === 'PENDING' && (
-                <button className="btn btn-primary btn-sm" onClick={() => setMissionStatus(m.id, "ASSIGNED")}>
+            <div key={m.id} className="action-row">
+              <div>
+                <div className="action-row-title">{m.reference}</div>
+                <div className="action-row-sub">Statut: {m.status}</div>
+              </div>
+              {m.status === "PENDING" && (
+                <button className="btn btn-primary btn-sm" onClick={() => acceptMission(m.id)}>
                   Accepter
                 </button>
               )}
-              {m.status === 'ASSIGNED' && (
-                <button className="btn btn-ghost btn-sm" style={{ marginLeft: 8 }} onClick={() => setMissionStatus(m.id, "IN_PROGRESS")}>
+              {m.status === "ASSIGNED" && (
+                <button className="btn btn-ghost btn-sm" onClick={() => setMissionStatus(m.id, "IN_PROGRESS")}>
                   Demarrer
                 </button>
               )}
-              {m.status === 'IN_PROGRESS' && (
-                <button className="btn btn-ghost btn-sm" style={{ marginLeft: 8 }} onClick={() => setMissionStatus(m.id, "DELIVERED")}>
+              {m.status === "IN_PROGRESS" && (
+                <button className="btn btn-ghost btn-sm" onClick={() => setMissionStatus(m.id, "DELIVERED")}>
                   Livrer
                 </button>
               )}

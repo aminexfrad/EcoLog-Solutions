@@ -27,6 +27,12 @@ exports.accept = async (req, res, next) => {
     const [rows] = await db.execute('SELECT * FROM shipments WHERE id = ?', [req.params.id]);
     if (rows.length === 0) return res.status(404).json({ message: 'Mission introuvable.' });
     const shipment = rows[0];
+    if (shipment.status !== 'PENDING') {
+      return res.status(400).json({ message: 'Seules les missions en attente peuvent être acceptées.' });
+    }
+    if (shipment.carrier_id && shipment.carrier_id !== req.user.id) {
+      return res.status(403).json({ message: 'Mission déjà attribuée à un autre transporteur.' });
+    }
 
     await db.execute(
       'UPDATE shipments SET carrier_id = ?, status = ? WHERE id = ?',
@@ -49,6 +55,9 @@ exports.reject = async (req, res, next) => {
     const [rows] = await db.execute('SELECT * FROM shipments WHERE id = ?', [req.params.id]);
     if (rows.length === 0) return res.status(404).json({ message: 'Mission introuvable.' });
     const shipment = rows[0];
+    if (shipment.status !== 'PENDING') {
+      return res.status(400).json({ message: 'Seules les missions en attente peuvent être refusées.' });
+    }
 
     await notifyMissionResponse(shipment.shipper_id, shipment.reference, req.user.name, false);
     await db.execute(

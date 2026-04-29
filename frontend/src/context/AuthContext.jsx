@@ -1,10 +1,11 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = "ecolog_user";
 
 export function AuthProvider({ children }) {
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -46,7 +47,31 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(STORAGE_KEY);
   };
 
-  const value = useMemo(() => ({ user, login, signup, logout }), [user]);
+  useEffect(() => {
+    const bootstrap = async () => {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const parsed = JSON.parse(saved);
+        if (!parsed?.token) throw new Error("Missing token");
+        const meRes = await api.get("/auth/me");
+        const hydrated = { ...meRes.data, token: parsed.token };
+        setUser(hydrated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(hydrated));
+      } catch {
+        setUser(null);
+        localStorage.removeItem(STORAGE_KEY);
+      } finally {
+        setLoading(false);
+      }
+    };
+    bootstrap();
+  }, []);
+
+  const value = useMemo(() => ({ user, loading, login, signup, logout }), [user, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

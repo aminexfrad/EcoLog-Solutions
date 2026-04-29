@@ -44,15 +44,15 @@ export default function ShipperDashboard() {
         <div className="card-h">
           <span className="card-title">Compensation carbone</span>
         </div>
-        <div className="card-b" style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <input className="finput" type="number" value={tons} onChange={(e) => setTons(e.target.value)} style={{ width: 120 }} />
+        <div className="card-b dash-inline-form">
+          <input className="finput" type="number" value={tons} onChange={(e) => setTons(e.target.value)} />
           <button className="btn btn-primary" onClick={() => buyCredits(tons)}>
             Acheter credits
           </button>
-          <span>Credits actuels: {credits.available} t</span>
+          <span className="subtle-chip">Credits actuels: {credits.available} t</span>
         </div>
       </div>
-      <button className="btn btn-primary" onClick={() => setOpen(true)} style={{ marginTop: 14 }}>
+      <button className="btn btn-primary" onClick={() => setOpen(true)}>
         ＋ Nouvelle expedition
       </button>
       <Modal open={open} title="📦 Nouvelle expedition" onClose={() => setOpen(false)} onConfirm={handleCreate} confirmLabel="Creer l'expedition">

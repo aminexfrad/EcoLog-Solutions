@@ -4,6 +4,20 @@ const { calculateCO2, compareOptions, estimateDistance } = require('../services/
 // GET /api/carbon/:shipmentId
 exports.getByShipment = async (req, res, next) => {
   try {
+    const [shipmentRows] = await db.execute(
+      'SELECT shipper_id, carrier_id FROM shipments WHERE id = ?',
+      [req.params.shipmentId]
+    );
+    if (shipmentRows.length === 0) {
+      return res.status(404).json({ message: 'Expédition introuvable.' });
+    }
+    const shipment = shipmentRows[0];
+    const canAccess =
+      req.user.role === 'admin' ||
+      shipment.shipper_id === req.user.id ||
+      shipment.carrier_id === req.user.id;
+    if (!canAccess) return res.status(403).json({ message: 'Accès refusé.' });
+
     const [rows] = await db.execute(
       `SELECT cf.*, s.origin, s.destination, s.weight_kg, r.vehicle_type
        FROM carbon_footprints cf

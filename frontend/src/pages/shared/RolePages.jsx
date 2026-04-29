@@ -28,6 +28,12 @@ export function RoleTablePage({ role, pageKey }) {
   const [origin, setOrigin] = useState("Paris 75001");
   const [destination, setDestination] = useState("Lyon 69001");
   const [weight, setWeight] = useState("5000");
+  const trackingTargets =
+    role === "carrier"
+      ? missions
+      : role === "admin" || role === "shipper"
+        ? shipments
+        : orders;
 
   let data = tableData[pageKey];
 
@@ -49,7 +55,7 @@ export function RoleTablePage({ role, pageKey }) {
   if (pageKey === "tracking") {
     data = {
       ...data,
-      rows: tracking.map((t) => [t.shipment_id, `${t.progress_pct}%`, new Date(t.recorded_at).toLocaleTimeString(), t.location_label || "-", "A l'instant"]),
+      rows: tracking.map((t) => [t.shipment_id || "-", `${t.progress_pct}%`, new Date(t.recorded_at).toLocaleTimeString(), t.location_label || "-", "A l'instant"]),
     };
   }
   if (pageKey === "documents") {
@@ -134,7 +140,7 @@ export function RoleTablePage({ role, pageKey }) {
 
           {pageKey === "tracking" && (
             <div style={{ marginTop: 10 }}>
-              {orders.filter(o => o.status !== 'DELIVERED').map(o => (
+              {(role === "carrier" || role === "admin") && trackingTargets.filter(o => o.status !== 'DELIVERED').map(o => (
                 <button key={o.id} className="btn btn-primary btn-sm" onClick={() => updateTracking(o.id)}>
                   Simuler avancee GPS pour {o.reference}
                 </button>

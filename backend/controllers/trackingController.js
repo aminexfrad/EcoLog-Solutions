@@ -25,28 +25,36 @@ exports.update = async (req, res, next) => {
 exports.getLatest = async (req, res, next) => {
   try {
     const { shipmentId } = req.params;
+    const [shipment] = await db.execute(
+      'SELECT id, shipper_id, carrier_id, status, deadline, reference FROM shipments WHERE id = ?',
+      [shipmentId]
+    );
+    if (shipment.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
+    const s = shipment[0];
+    const canAccess =
+      req.user.role === 'admin' ||
+      s.shipper_id === req.user.id ||
+      s.carrier_id === req.user.id;
+    if (!canAccess) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
+
     const [latest] = await db.execute(
       `SELECT * FROM gps_updates WHERE shipment_id = ? ORDER BY recorded_at DESC LIMIT 1`,
       [shipmentId]
     );
     const [history] = await db.execute(
-      `SELECT latitude, longitude, location_label, progress_pct, recorded_at
+      `SELECT shipment_id, latitude, longitude, location_label, progress_pct, recorded_at
        FROM gps_updates WHERE shipment_id = ? ORDER BY recorded_at ASC`,
       [shipmentId]
     );
-    const [shipment] = await db.execute(
-      'SELECT status, deadline, reference FROM shipments WHERE id = ?',
-      [shipmentId]
-    );
-
-    if (shipment.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
 
     res.json({
       current: latest[0] || null,
       history,
-      status:  shipment[0].status,
-      reference: shipment[0].reference,
-      eta:     shipment[0].deadline,
+      status: s.status,
+      reference: s.reference,
+      eta: s.deadline,
     });
   } catch (err) { next(err); }
 };
@@ -55,6 +63,11 @@ exports.getLatest = async (req, res, next) => {
 exports.simulate = async (req, res, next) => {
   try {
     const { shipmentId } = req.params;
+    const [shipRows] = await db.execute('SELECT shipper_id, carrier_id FROM shipments WHERE id = ?', [shipmentId]);
+    if (shipRows.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
+    if (req.user.role === 'carrier' && shipRows[0].carrier_id !== req.user.id) {
+      return res.status(403).json({ message: 'Accès refusé.' });
+    }
     const [rows] = await db.execute(
       `SELECT r.origin_lat, r.origin_lng, r.dest_lat, r.dest_lng,
               g.progress_pct, g.latitude, g.longitude

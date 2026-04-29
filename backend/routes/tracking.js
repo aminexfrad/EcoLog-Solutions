@@ -6,6 +6,6 @@ router.use(verifyToken);
 
 router.get('/:shipmentId',           ctrl.getLatest);
 router.post('/:shipmentId',          requireRole('carrier','admin'), ctrl.update);
-router.post('/:shipmentId/simulate', ctrl.simulate);
+router.post('/:shipmentId/simulate', requireRole('carrier','admin'), ctrl.simulate);
 
 module.exports = router;
