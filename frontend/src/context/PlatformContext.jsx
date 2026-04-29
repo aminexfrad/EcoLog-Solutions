@@ -11,7 +11,7 @@ export function PlatformProvider({ children }) {
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   const [carrierRequests, setCarrierRequests] = useState([]);
-  const [credits, setCredits] = useState({ available: 0, spentEur: 0 });
+  const [credits, setCredits] = useState({ available: 0, spentTnd: 0 });
   const [notifications, setNotifications] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -22,7 +22,7 @@ export function PlatformProvider({ children }) {
   const fetchDashboardData = useCallback(async () => {
     if (!user) {
       setShipments([]); setMissions([]); setOrders([]); setUsers([]);
-      setCarrierRequests([]); setCredits({ available: 0, spentEur: 0 });
+      setCarrierRequests([]); setCredits({ available: 0, spentTnd: 0 });
       setNotifications([]); setDocuments([]); setAuditLogs([]); setTracking([]);
       return;
     }
@@ -38,7 +38,7 @@ export function PlatformProvider({ children }) {
       if (user.role === 'shipper' || user.role === 'admin') {
         const [shipRes, compRes] = await Promise.all([api.get('/shipments'), api.get('/compensations')]);
         setShipments(shipRes.data);
-        setCredits({ available: compRes.data.total_tons || 0, spentEur: compRes.data.total_eur || 0 });
+        setCredits({ available: compRes.data.total_tons || 0, spentTnd: compRes.data.total_tnd || 0 });
       }
 
       if (user.role === 'carrier') {

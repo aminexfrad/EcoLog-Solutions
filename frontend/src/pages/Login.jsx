@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function Login() {
       <div className="auth-right">
         <form className="auth-card" onSubmit={submit}>
           <div className="auth-card-title">Bienvenue</div>
-          <div className="auth-card-sub">Accédez à votre espace logistique.</div>
+          <div className="auth-card-sub">{t("auth.accessSpace")}</div>
           
           <div className="field-group">
             <label className="field-label">Email</label>
@@ -72,11 +74,11 @@ export default function Login() {
           </div>
           
           <button className="btn-auth" type="submit">
-            Se connecter →
+            {t("auth.login")} →
           </button>
           
           <div className="auth-switch">
-            Pas encore de compte ? <Link className="auth-link" to="/signup">S'inscrire</Link>
+            {t("auth.noAccount")} <Link className="auth-link" to="/signup">{t("auth.signup")}</Link>
           </div>
         </form>
       </div>

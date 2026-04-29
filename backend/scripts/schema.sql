@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS shipments (
   id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   reference     VARCHAR(20)   NOT NULL UNIQUE,
   shipper_id    INT UNSIGNED  NOT NULL,
+  client_id     INT UNSIGNED,
   carrier_id    INT UNSIGNED,
   origin        VARCHAR(200)  NOT NULL,
   destination   VARCHAR(200)  NOT NULL,
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS shipments (
   created_at    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   delivered_at  DATETIME,
   FOREIGN KEY (shipper_id) REFERENCES users(id) ON DELETE RESTRICT,
+  FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (carrier_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -171,6 +173,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 -- INDEXES for performance
 -- ============================================================
 CREATE INDEX idx_shipments_shipper   ON shipments(shipper_id);
+CREATE INDEX idx_shipments_client   ON shipments(client_id);
 CREATE INDEX idx_shipments_carrier   ON shipments(carrier_id);
 CREATE INDEX idx_shipments_status    ON shipments(status);
 CREATE INDEX idx_notifications_user  ON notifications(user_id, is_read);

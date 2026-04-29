@@ -4,6 +4,7 @@ import DataTable from "../../components/DataTable";
 import Modal from "../../components/Modal";
 import { tableData } from "../../data/mockData";
 import { usePlatform } from "../../context/PlatformContext";
+import { formatCurrencyTND } from "../../utils/format";
 
 export default function ShipperDashboard() {
   const [open, setOpen] = useState(false);
@@ -11,6 +12,7 @@ export default function ShipperDashboard() {
   const [origin, setOrigin] = useState("Paris 75001");
   const [destination, setDestination] = useState("Lyon 69001");
   const [weight, setWeight] = useState("5000");
+  const [clientEmail, setClientEmail] = useState("client@ecolog.fr");
 
   const { buyCredits, credits, shipments, createShipment } = usePlatform();
 
@@ -22,13 +24,13 @@ export default function ShipperDashboard() {
       { icon: "📦", value: shipments.length.toString(), label: "Expeditions", trend: "Total", tone: "sc-green" },
       { icon: "🌡️", value: `${totalCo2.toFixed(1)} kg`, label: "CO2 emis", trend: "Cumul", tone: "sc-navy" },
       { icon: "💰", value: credits.available.toString(), label: "Credits carbone (t)", trend: "Disponibles", tone: "sc-amber" },
-      { icon: "♻️", value: `${credits.spentEur} €`, label: "Investissement", trend: "Cumul", tone: "sc-green" },
+      { icon: "♻️", value: formatCurrencyTND(credits.spentTnd), label: "Investissement", trend: "Cumul", tone: "sc-green" },
     ];
   }, [shipments, credits]);
 
   const handleCreate = async () => {
     if (!origin || !destination || !weight) return;
-    await createShipment({ origin, destination, weight_kg: weight });
+    await createShipment({ origin, destination, weight_kg: weight, client_email: clientEmail || null });
     setOpen(false);
   };
 
@@ -60,6 +62,7 @@ export default function ShipperDashboard() {
           <div className="fgroup"><div className="flabel">Origine</div><input className="finput" value={origin} onChange={e => setOrigin(e.target.value)} /></div>
           <div className="fgroup"><div className="flabel">Destination</div><input className="finput" value={destination} onChange={e => setDestination(e.target.value)} /></div>
           <div className="fgroup"><div className="flabel">Poids (kg)</div><input className="finput" type="number" value={weight} onChange={e => setWeight(e.target.value)} /></div>
+          <div className="fgroup"><div className="flabel">Email du client (optionnel)</div><input className="finput" value={clientEmail} onChange={e => setClientEmail(e.target.value)} /></div>
         </div>
       </Modal>
     </>

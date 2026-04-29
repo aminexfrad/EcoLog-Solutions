@@ -39,6 +39,31 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.lang-select {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+}
+
+html[dir="rtl"] .topbar {
+  text-align: right;
+}
+
+html[dir="rtl"] .topbar-actions {
+  justify-content: flex-start;
+}
+
+html[dir="rtl"] .nav-item:hover {
+  transform: translateX(-2px);
+}
+
 /* AUTHENTICATION */
 .auth-screen {
   min-height: 100vh;
@@ -756,7 +781,7 @@ tbody tr:hover {
     #ffffff;
   border: 1px solid var(--border);
   border-radius: 16px;
-  box-shadow: 0 24px 40px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 28px 50px rgba(15, 23, 42, 0.18);
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
@@ -770,6 +795,11 @@ tbody tr:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+html[dir="rtl"] .chatbot-root {
+  right: auto;
+  left: 22px;
 }
 
 .chatbot-title {

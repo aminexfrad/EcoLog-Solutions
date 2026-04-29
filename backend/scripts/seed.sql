@@ -28,10 +28,10 @@ INSERT INTO vehicles (carrier_id, name, energy_type, capacity_tons, emission_fac
 -- ============================================================
 -- SHIPMENTS
 -- ============================================================
-INSERT INTO shipments (reference, shipper_id, carrier_id, origin, destination, weight_kg, volume_m3, status, deadline) VALUES
-('EXP-0247', 2, 3, 'Paris 75001',      'Lyon 69001',      5000.00, 12.50, 'IN_PROGRESS', '2026-05-01 18:00:00'),
-('EXP-0246', 2, 5, 'Marseille 13001',  'Bordeaux 33000',  3200.00,  8.00, 'ASSIGNED',    '2026-05-02 12:00:00'),
-('EXP-0245', 2, 3, 'Lille 59000',      'Strasbourg 67000',7000.00, 20.00, 'DELIVERED',   '2026-04-27 18:00:00');
+INSERT INTO shipments (reference, shipper_id, client_id, carrier_id, origin, destination, weight_kg, volume_m3, status, deadline) VALUES
+('EXP-0247', 2, 4, 3, 'Paris 75001',      'Lyon 69001',      5000.00, 12.50, 'IN_PROGRESS', '2026-05-01 18:00:00'),
+('EXP-0246', 2, 4, 5, 'Marseille 13001',  'Bordeaux 33000',  3200.00,  8.00, 'ASSIGNED',    '2026-05-02 12:00:00'),
+('EXP-0245', 2, 4, 3, 'Lille 59000',      'Strasbourg 67000',7000.00, 20.00, 'DELIVERED',   '2026-04-27 18:00:00');
 
 UPDATE shipments SET delivered_at = '2026-04-27 17:30:00' WHERE reference = 'EXP-0245';
 

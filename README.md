@@ -70,6 +70,17 @@ Create a MySQL database with the name configured in `DB_NAME` (default: `ecolog_
 
 If you already have SQL scripts/migrations in your project, run them before starting the app.
 
+### Migration: client ownership on shipments
+
+To match the cahier requirement “Client final suit ses commandes”, shipments support an optional `client_id`.
+
+If your database was created before this field existed, run:
+
+```bash
+cd backend
+node scripts/migrate-add-client-id.js
+```
+
 ## 4) Run locally
 
 Start backend:

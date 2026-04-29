@@ -12,15 +12,32 @@ async function generateRef() {
 // POST /api/shipments  (shipper only)
 exports.create = async (req, res, next) => {
   try {
-    const { origin, destination, weight_kg, volume_m3, deadline, vehicle_type = 'diesel' } = req.body;
+    const { origin, destination, weight_kg, volume_m3, deadline, vehicle_type = 'diesel', client_id, client_email } = req.body;
     if (!origin || !destination || !weight_kg)
       return res.status(400).json({ message: 'Origine, destination et poids sont requis.' });
 
+    let resolvedClientId = null;
+    if (client_id) {
+      const [clientRows] = await db.execute(
+        'SELECT id FROM users WHERE id = ? AND role = ? AND is_active = 1 LIMIT 1',
+        [client_id, 'client']
+      );
+      if (clientRows.length === 0) return res.status(404).json({ message: 'Client introuvable.' });
+      resolvedClientId = clientRows[0].id;
+    } else if (client_email) {
+      const [clientRows] = await db.execute(
+        'SELECT id FROM users WHERE email = ? AND role = ? AND is_active = 1 LIMIT 1',
+        [client_email, 'client']
+      );
+      if (clientRows.length === 0) return res.status(404).json({ message: 'Client introuvable (email).' });
+      resolvedClientId = clientRows[0].id;
+    }
+
     const reference = await generateRef();
     const [result] = await db.execute(
-      `INSERT INTO shipments (reference, shipper_id, origin, destination, weight_kg, volume_m3, deadline)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [reference, req.user.id, origin, destination, weight_kg, volume_m3 || null, deadline || null]
+      `INSERT INTO shipments (reference, shipper_id, client_id, origin, destination, weight_kg, volume_m3, deadline)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [reference, req.user.id, resolvedClientId, origin, destination, weight_kg, volume_m3 || null, deadline || null]
     );
     const shipmentId = result.insertId;
 
@@ -96,7 +113,7 @@ exports.getAll = async (req, res, next) => {
       query += ' WHERE s.carrier_id = ?';
       params.push(req.user.id);
     } else if (req.user.role === 'client') {
-      query += ' WHERE s.shipper_id = ?';
+      query += ' WHERE s.client_id = ?';
       params.push(req.user.id);
     }
     query += ' ORDER BY s.created_at DESC';
@@ -128,7 +145,8 @@ exports.getById = async (req, res, next) => {
     const canAccess =
       req.user.role === 'admin' ||
       shipment.shipper_id === req.user.id ||
-      shipment.carrier_id === req.user.id;
+      shipment.carrier_id === req.user.id ||
+      shipment.client_id === req.user.id;
     if (!canAccess) {
       return res.status(403).json({ message: 'Accès refusé.' });
     }

@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo.jpeg";
+import { useTranslation } from "react-i18next";
 
 export default function Signup() {
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "shipper" });
   const { signup, user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function Signup() {
           <div className="auth-card-sub">Renseignez vos informations.</div>
           
           <div className="field-group">
-            <label className="field-label">Nom complet</label>
+            <label className="field-label">{t("auth.fullName")}</label>
             <input 
               className="field-input" 
               value={form.name} 
@@ -58,7 +60,7 @@ export default function Signup() {
           </div>
           
           <div className="field-group">
-            <label className="field-label">Email</label>
+            <label className="field-label">{t("auth.email")}</label>
             <input 
               className="field-input" 
               type="email"
@@ -70,20 +72,20 @@ export default function Signup() {
           </div>
           
           <div className="field-group">
-            <label className="field-label">Type de profil</label>
+            <label className="field-label">{t("auth.profileType")}</label>
             <select 
               className="field-input" 
               value={form.role} 
               onChange={(e) => setForm({ ...form, role: e.target.value })}
             >
-              <option value="shipper">Expéditeur</option>
-              <option value="carrier">Transporteur</option>
-              <option value="client">Client final</option>
+              <option value="shipper">{t("auth.shipper")}</option>
+              <option value="carrier">{t("auth.carrier")}</option>
+              <option value="client">{t("auth.client")}</option>
             </select>
           </div>
           
           <div className="field-group">
-            <label className="field-label">Mot de passe</label>
+            <label className="field-label">{t("auth.password")}</label>
             <input 
               className="field-input" 
               type="password" 
@@ -95,11 +97,11 @@ export default function Signup() {
           </div>
           
           <button className="btn-auth" type="submit">
-            S'inscrire →
+            {t("auth.signup")} →
           </button>
           
           <div className="auth-switch">
-            Déjà inscrit ? <Link className="auth-link" to="/login">Se connecter</Link>
+            {t("auth.alreadyAccount")} <Link className="auth-link" to="/login">{t("auth.login")}</Link>
           </div>
         </form>
       </div>

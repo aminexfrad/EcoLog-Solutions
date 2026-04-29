@@ -26,7 +26,7 @@ exports.getLatest = async (req, res, next) => {
   try {
     const { shipmentId } = req.params;
     const [shipment] = await db.execute(
-      'SELECT id, shipper_id, carrier_id, status, deadline, reference FROM shipments WHERE id = ?',
+      'SELECT id, shipper_id, client_id, carrier_id, status, deadline, reference FROM shipments WHERE id = ?',
       [shipmentId]
     );
     if (shipment.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
@@ -34,7 +34,8 @@ exports.getLatest = async (req, res, next) => {
     const canAccess =
       req.user.role === 'admin' ||
       s.shipper_id === req.user.id ||
-      s.carrier_id === req.user.id;
+      s.carrier_id === req.user.id ||
+      s.client_id === req.user.id;
     if (!canAccess) {
       return res.status(403).json({ message: 'Accès refusé.' });
     }
@@ -63,7 +64,7 @@ exports.getLatest = async (req, res, next) => {
 exports.simulate = async (req, res, next) => {
   try {
     const { shipmentId } = req.params;
-    const [shipRows] = await db.execute('SELECT shipper_id, carrier_id FROM shipments WHERE id = ?', [shipmentId]);
+    const [shipRows] = await db.execute('SELECT shipper_id, client_id, carrier_id FROM shipments WHERE id = ?', [shipmentId]);
     if (shipRows.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
     if (req.user.role === 'carrier' && shipRows[0].carrier_id !== req.user.id) {
       return res.status(403).json({ message: 'Accès refusé.' });

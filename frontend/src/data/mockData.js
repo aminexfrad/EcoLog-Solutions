@@ -75,7 +75,7 @@ export const dashboardData = {
       { icon: "✅", value: "34", label: "Missions", trend: "▲ +8%", tone: "sc-green" },
       { icon: "⭐", value: "4.8", label: "Note moyenne", trend: "▲ +0.2", tone: "sc-navy" },
       { icon: "🌿", value: "94", label: "Score vert", trend: "▲ +2 pts", tone: "sc-green" },
-      { icon: "💶", value: "8 420€", label: "Revenus mois", trend: "▲ +12%", tone: "sc-amber" },
+      { icon: "💶", value: "28 200 TND", label: "Revenus mois", trend: "▲ +12%", tone: "sc-amber" },
     ],
   },
   client: {
@@ -110,9 +110,9 @@ export const tableData = {
     title: "Marketplace credits carbone",
     columns: ["Projet", "Certification", "Prix/t", "Disponibilite"],
     rows: [
-      ["Reforestation Amazonie", "Gold Standard", "18€", "5000 t"],
-      ["Parc Solaire Sahel", "VCS Verra", "14€", "8000 t"],
-      ["Eoliennes Normandes", "Label Bas-Carbone", "22€", "200 t"],
+      ["Reforestation Amazonie", "Gold Standard", "60 TND", "5000 t"],
+      ["Parc Solaire Sahel", "VCS Verra", "47 TND", "8000 t"],
+      ["Eoliennes Normandes", "Label Bas-Carbone", "74 TND", "200 t"],
     ],
   },
   missions: {
@@ -210,7 +210,7 @@ export const reportData = {
   },
   reports: {
     title: "Rapports ESG administrateur",
-    highlights: ["CO2 evite plateforme: 184 t", "Credits vendus: 24 180€", "Taux transport vert: 71%"],
+    highlights: ["CO2 evite plateforme: 184 t", "Credits vendus: 81 000 TND", "Taux transport vert: 71%"],
   },
   esg: {
     title: "Rapport ESG expediteur",

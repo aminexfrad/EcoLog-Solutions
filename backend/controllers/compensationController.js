@@ -7,6 +7,9 @@ const PROJECTS = [
   { name: 'Éoliennes Normandes',    certification: 'Label Bas-Carbone',   price_per_ton: 22 },
 ];
 
+const eurToTndRate = () => parseFloat(process.env.EUR_TO_TND || '3.35');
+const toTnd = (eur) => parseFloat((parseFloat(eur || 0) * eurToTndRate()).toFixed(2));
+
 // GET /api/compensations/projects  (available carbon credit projects)
 exports.getProjects = async (_req, res, next) => {
   try {
@@ -24,6 +27,7 @@ exports.buy = async (req, res, next) => {
     const project = PROJECTS[parseInt(project_index)] || PROJECTS[0];
     const tons_float = parseFloat(tons);
     const price_eur = parseFloat((tons_float * project.price_per_ton).toFixed(2));
+    const price_tnd = toTnd(price_eur);
 
     // Unique certificate number
     const cert_id = `CERT-${Date.now()}-${req.user.id}`;
@@ -39,13 +43,13 @@ exports.buy = async (req, res, next) => {
     // Audit
     await db.execute(
       `INSERT INTO audit_logs (user_id, action, entity_type, entity_id, details) VALUES (?, 'BUY_CREDITS', 'compensation', ?, ?)`,
-      [req.user.id, result.insertId, `Achat ${tons_float}t CO2 crédits — ${project.name} — ${price_eur}€`]
+      [req.user.id, result.insertId, `Achat ${tons_float}t CO2 crédits — ${project.name} — ${price_tnd} TND`]
     );
 
     // Notify
     await createNotification(
       req.user.id, 'compensation_bought',
-      `Achat de ${tons_float}t crédits carbone (${project.name}) — ${price_eur}€. Certificat disponible.`
+      `Achat de ${tons_float}t crédits carbone (${project.name}) — ${price_tnd} TND. Certificat disponible.`
     );
 
     // If linked to a shipment, add document
@@ -57,7 +61,7 @@ exports.buy = async (req, res, next) => {
     }
 
     const [rows] = await db.execute('SELECT * FROM compensations WHERE id = ?', [result.insertId]);
-    res.status(201).json(rows[0]);
+    res.status(201).json({ ...rows[0], price_tnd });
   } catch (err) { next(err); }
 };
 
@@ -77,7 +81,15 @@ exports.getAll = async (req, res, next) => {
     );
     const total_tons = rows.reduce((s, r) => s + parseFloat(r.tons_compensated), 0);
     const total_eur  = rows.reduce((s, r) => s + parseFloat(r.price_eur), 0);
-    res.json({ total_tons: parseFloat(total_tons.toFixed(4)), total_eur: parseFloat(total_eur.toFixed(2)), entries: rows });
+    const total_tnd = toTnd(total_eur);
+    const entries = rows.map((r) => ({ ...r, price_tnd: toTnd(r.price_eur) }));
+    res.json({
+      total_tons: parseFloat(total_tons.toFixed(4)),
+      total_tnd,
+      entries,
+      currency: 'TND',
+      eur_to_tnd: eurToTndRate(),
+    });
   } catch (err) { next(err); }
 };
 
@@ -95,8 +107,10 @@ exports.getCertificate = async (req, res, next) => {
       project:         rows[0].project_name,
       certification:   rows[0].certification,
       tons:            rows[0].tons_compensated,
-      price:           rows[0].price_eur,
+      price_tnd:       toTnd(rows[0].price_eur),
       issued_at:       rows[0].created_at,
+      currency:        'TND',
+      eur_to_tnd:      eurToTndRate(),
     });
   } catch (err) { next(err); }
 };

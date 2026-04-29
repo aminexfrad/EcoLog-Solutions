@@ -1,7 +1,9 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/logo.jpeg";
+import { useTranslation } from "react-i18next";
 
 export default function Sidebar({ role, subtitle, items, user, onLogout }) {
+  const { t } = useTranslation();
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -29,7 +31,7 @@ export default function Sidebar({ role, subtitle, items, user, onLogout }) {
             <div className="user-sb-role">{user.label}</div>
           </div>
           <button className="logout-btn" onClick={onLogout}>
-            Deconnexion
+            {t("common.logout")}
           </button>
         </div>
       </div>

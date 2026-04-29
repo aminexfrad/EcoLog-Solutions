@@ -2,12 +2,13 @@ import { useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { usePlatform } from "../context/PlatformContext";
 import api from "../services/api";
+import { useTranslation } from "react-i18next";
 
 const quickActionsByRole = {
-  shipper: ["Resume de mon activite", "Comment reduire mon CO2 ?", "Comment mieux planifier mes expeditions ?"],
-  carrier: ["Resume de mes missions", "Conseil eco pour ma flotte", "Comment augmenter mon score vert ?"],
-  client: ["Ou en sont mes commandes ?", "Mes notifications non lues", "Comment lire mon impact carbone ?"],
-  admin: ["Etat global plateforme", "Anomalies a surveiller", "Conseil pour optimiser l'adoption"],
+  shipper: ["Résumé de mon activité", "Comment réduire mon CO2 ?", "Comment mieux planifier mes expéditions ?"],
+  carrier: ["Résumé de mes missions", "Conseil éco pour ma flotte", "Comment augmenter mon score vert ?"],
+  client: ["Où en sont mes commandes ?", "Mes notifications non lues", "Comment lire mon impact carbone ?"],
+  admin: ["État global plateforme", "Anomalies à surveiller", "Conseil pour optimiser l'adoption"],
 };
 
 function createFallbackReply(text, context) {
@@ -32,6 +33,7 @@ export default function ChatbotWidget({ role }) {
 
   const { user } = useAuth();
   const { shipments, missions, orders, notifications, credits } = usePlatform();
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -40,7 +42,7 @@ export default function ChatbotWidget({ role }) {
     {
       id: 1,
       from: "bot",
-      text: "Bonjour, je suis EcoBot. Je peux vous guider sur la plateforme et repondre a vos questions logistiques.",
+      text: "Bonjour, je suis EcoBot. Je peux vous guider sur la plateforme.",
     },
   ]);
 
@@ -99,7 +101,7 @@ export default function ChatbotWidget({ role }) {
                 {msg.text}
               </div>
             ))}
-            {isLoading && <div className="chat-msg chat-msg-bot chat-msg-thinking">EcoBot reflechit...</div>}
+            {isLoading && <div className="chat-msg chat-msg-bot chat-msg-thinking">{t("common.thinking")}</div>}
           </div>
           <div className="chatbot-quick-actions">
             {quickActions.map((action) => (
@@ -120,7 +122,7 @@ export default function ChatbotWidget({ role }) {
               }}
             />
             <button className="btn btn-primary btn-sm" onClick={() => sendMessage(input)} disabled={isLoading}>
-              {isLoading ? "..." : "Envoyer"}
+              {isLoading ? "..." : t("common.send")}
             </button>
           </div>
         </section>

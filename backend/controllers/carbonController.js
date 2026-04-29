@@ -5,7 +5,7 @@ const { calculateCO2, compareOptions, estimateDistance } = require('../services/
 exports.getByShipment = async (req, res, next) => {
   try {
     const [shipmentRows] = await db.execute(
-      'SELECT shipper_id, carrier_id FROM shipments WHERE id = ?',
+      'SELECT shipper_id, client_id, carrier_id FROM shipments WHERE id = ?',
       [req.params.shipmentId]
     );
     if (shipmentRows.length === 0) {
@@ -15,7 +15,8 @@ exports.getByShipment = async (req, res, next) => {
     const canAccess =
       req.user.role === 'admin' ||
       shipment.shipper_id === req.user.id ||
-      shipment.carrier_id === req.user.id;
+      shipment.carrier_id === req.user.id ||
+      shipment.client_id === req.user.id;
     if (!canAccess) return res.status(403).json({ message: 'Accès refusé.' });
 
     const [rows] = await db.execute(

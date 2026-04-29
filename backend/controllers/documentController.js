@@ -4,7 +4,7 @@ const db = require('../config/db');
 exports.getByShipment = async (req, res, next) => {
   try {
     const [shipmentRows] = await db.execute(
-      'SELECT shipper_id, carrier_id FROM shipments WHERE id = ?',
+      'SELECT shipper_id, client_id, carrier_id FROM shipments WHERE id = ?',
       [req.params.shipmentId]
     );
     if (shipmentRows.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
@@ -12,7 +12,8 @@ exports.getByShipment = async (req, res, next) => {
     const canAccess =
       req.user.role === 'admin' ||
       shipment.shipper_id === req.user.id ||
-      shipment.carrier_id === req.user.id;
+      shipment.carrier_id === req.user.id ||
+      shipment.client_id === req.user.id;
     if (!canAccess) return res.status(403).json({ message: 'Accès refusé.' });
 
     const [rows] = await db.execute(
@@ -35,7 +36,8 @@ exports.getAll = async (req, res, next) => {
       JOIN shipments s ON s.id = d.shipment_id
       JOIN users u ON u.id = d.uploaded_by`;
     const params = [];
-    if (req.user.role === 'shipper' || req.user.role === 'client') { query += ' WHERE s.shipper_id = ?'; params.push(req.user.id); }
+    if (req.user.role === 'shipper') { query += ' WHERE s.shipper_id = ?'; params.push(req.user.id); }
+    else if (req.user.role === 'client') { query += ' WHERE s.client_id = ?'; params.push(req.user.id); }
     else if (req.user.role === 'carrier') { query += ' WHERE s.carrier_id = ?'; params.push(req.user.id); }
     query += ' ORDER BY d.created_at DESC';
     const [rows] = await db.execute(query, params);
@@ -48,7 +50,7 @@ exports.create = async (req, res, next) => {
   try {
     const { shipment_id, type } = req.body;
     const [shipmentRows] = await db.execute(
-      'SELECT shipper_id, carrier_id FROM shipments WHERE id = ?',
+      'SELECT shipper_id, client_id, carrier_id FROM shipments WHERE id = ?',
       [shipment_id]
     );
     if (shipmentRows.length === 0) return res.status(404).json({ message: 'Expédition introuvable.' });
@@ -56,7 +58,8 @@ exports.create = async (req, res, next) => {
     const canUpload =
       req.user.role === 'admin' ||
       shipment.shipper_id === req.user.id ||
-      shipment.carrier_id === req.user.id;
+      shipment.carrier_id === req.user.id ||
+      shipment.client_id === req.user.id;
     if (!canUpload) return res.status(403).json({ message: 'Accès refusé.' });
 
     const file_url = req.file ? `/uploads/${req.file.filename}` : null;

@@ -3,6 +3,7 @@ import { reportData, roleConfig, tableData } from "../../data/mockData";
 import { usePlatform } from "../../context/PlatformContext";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
+import { formatCurrencyTND } from "../../utils/format";
 
 export function RoleTablePage({ role, pageKey }) {
   const {
@@ -28,6 +29,7 @@ export function RoleTablePage({ role, pageKey }) {
   const [origin, setOrigin] = useState("Paris 75001");
   const [destination, setDestination] = useState("Lyon 69001");
   const [weight, setWeight] = useState("5000");
+  const [clientEmail, setClientEmail] = useState("client@ecolog.fr");
   const trackingTargets =
     role === "carrier"
       ? missions
@@ -101,12 +103,16 @@ export function RoleTablePage({ role, pageKey }) {
                 <div className="flabel">Poids (kg)</div>
                 <input className="finput" type="number" value={weight} onChange={(e) => setWeight(e.target.value)} />
               </div>
+              <div className="fgroup">
+                <div className="flabel">Email du client (optionnel)</div>
+                <input className="finput" value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} />
+              </div>
               <div className="fgroup" style={{ justifyContent: "end" }}>
                 <button
                   className="btn btn-primary"
                   onClick={() => {
                     if (!origin || !destination || !weight) return;
-                    createShipment({ origin, destination, weight_kg: weight });
+                    createShipment({ origin, destination, weight_kg: weight, client_email: clientEmail || null });
                   }}
                 >
                   + Creer expedition
@@ -167,7 +173,7 @@ export function RoleTablePage({ role, pageKey }) {
 
           {pageKey === "marketplace" && (
             <div style={{ marginTop: 10 }} className="pg-sub">
-              Credits disponibles: {credits.available} tonnes • Budget cumule: {credits.spentEur}€
+              Credits disponibles: {credits.available} tonnes • Budget cumule: {formatCurrencyTND(credits.spentTnd)}
             </div>
           )}
         </div>
